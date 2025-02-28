@@ -1,54 +1,53 @@
-package info.jab.ms.dto;
+package info.jab.ms.domain.model;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * Data Transfer Object for Actor entity.
- * Used to transfer actor data between layers without exposing the entity directly.
+ * Actor domain entity representing a film actor.
  */
-public class ActorDTO {
+public class Actor {
+
     private Long id;
     private String firstName;
     private String lastName;
     private LocalDateTime lastUpdate;
 
-    public ActorDTO() {
-    }
-
-    public ActorDTO(Long id, String firstName, String lastName, LocalDateTime lastUpdate) {
+    public Actor(Long id, String firstName, String lastName, LocalDateTime lastUpdate) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.lastUpdate = lastUpdate;
     }
 
+    public Actor() {}
+
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
     public LocalDateTime getLastUpdate() {
         return lastUpdate;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public void setLastUpdate(LocalDateTime lastUpdate) {
@@ -59,11 +58,8 @@ public class ActorDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ActorDTO actorDTO = (ActorDTO) o;
-        return Objects.equals(id, actorDTO.id) &&
-                Objects.equals(firstName, actorDTO.firstName) &&
-                Objects.equals(lastName, actorDTO.lastName) &&
-                Objects.equals(lastUpdate, actorDTO.lastUpdate);
+        Actor actor = (Actor) o;
+        return Objects.equals(id, actor.id) && Objects.equals(firstName, actor.firstName) && Objects.equals(lastName, actor.lastName) && Objects.equals(lastUpdate, actor.lastUpdate);
     }
 
     @Override
@@ -73,7 +69,7 @@ public class ActorDTO {
 
     @Override
     public String toString() {
-        return "ActorDTO{" +
+        return "Actor{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +

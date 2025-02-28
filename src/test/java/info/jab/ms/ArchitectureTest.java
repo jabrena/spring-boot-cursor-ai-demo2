@@ -2,113 +2,125 @@ package info.jab.ms;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
-import com.tngtech.archunit.library.Architectures;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
+import static com.tngtech.archunit.library.Architectures.onionArchitecture;
 
 public class ArchitectureTest {
 
     private final JavaClasses classes = new ClassFileImporter().importPackages("info.jab.ms");
 
     @Test
-    public void layeredArchitectureShouldBeRespected() {
-        var architecture = layeredArchitecture()
-                .consideringAllDependencies()
-                .layer("Controller").definedBy("..controller..")
-                .layer("Service").definedBy("..service..")
-                .layer("Repository").definedBy("..repository..")
-                .layer("DTO").definedBy("..dto..")
-                
-                .whereLayer("Controller").mayNotBeAccessedByAnyLayer()
-                .whereLayer("Service").mayOnlyBeAccessedByLayers("Controller")
-                .whereLayer("Repository").mayOnlyBeAccessedByLayers("Service")
-                .whereLayer("DTO").mayOnlyBeAccessedByLayers("Controller", "Service");
+    public void onionArchitectureShouldBeRespected() {
+        var architecture = onionArchitecture()
+                .domainModels("..domain.model..")
+                .domainServices("..domain.service..")
+                .applicationServices("..application..")
+                .adapter("web", "..adapter.web..")
+                .adapter("persistence", "..adapter.persistence..")
+                .adapter("config", "..config..");
 
         architecture.check(classes);
     }
 
     @Test
-    public void controllersShouldNotDependDirectlyOnRepositories() {
+    public void domainModelsShouldNotDependOnAnyOtherLayer() {
         ArchRule rule = noClasses()
-                .that().resideInAPackage("..controller..")
-                .and().haveSimpleNameNotEndingWith("Test")
-                .should().dependOnClassesThat().resideInAPackage("..repository..");
+                .that().resideInAPackage("..domain.model..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "..domain.service..",
+                        "..application..",
+                        "..adapter..",
+                        "..config..");
 
         rule.check(classes);
     }
 
     @Test
-    public void repositoriesShouldNotDependOnServices() {
-        ArchRule rule = noClasses()
-                .that().resideInAPackage("..repository..")
-                .and().haveSimpleNameNotEndingWith("Test")
-                .should().dependOnClassesThat().resideInAPackage("..service..");
-
-        rule.check(classes);
-    }
-
-    @Test
-    public void serviceClassesShouldHaveServiceSuffix() {
+    public void domainServicesShouldOnlyDependOnDomainModels() {
         ArchRule rule = classes()
-                .that().resideInAPackage("..service..")
+                .that().resideInAPackage("..domain.service..")
+                .and().haveSimpleNameNotEndingWith("Test")
+                .should().onlyDependOnClassesThat().resideInAnyPackage(
+                        "..domain.service..",
+                        "..domain.model..",
+                        "java..",
+                        "org.springframework..",
+                        "javax..",
+                        "jakarta..");
+
+        rule.check(classes);
+    }
+
+    @Test
+    public void applicationServicesShouldNotDependOnAdapters() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("..application..")
+                .should().dependOnClassesThat().resideInAPackage("..adapter..");
+
+        rule.check(classes);
+    }
+
+    @Test
+    public void adaptersShouldNotDependOnEachOther() {
+        ArchRule rule = noClasses()
+                .that().resideInAPackage("..adapter.web..")
+                .should().dependOnClassesThat().resideInAPackage("..adapter.persistence..")
+                .andShould().dependOnClassesThat().resideInAPackage("..adapter.config..");
+
+        rule.check(classes);
+    }
+
+    @Test
+    public void domainModelClassesShouldFollowNamingConvention() {
+        ArchRule rule = classes()
+                .that().resideInAPackage("..domain.model..")
+                .and().haveSimpleNameNotEndingWith("Test")
+                .and().haveSimpleNameNotEndingWith("Repository")
+                .should().haveSimpleNameNotEndingWith("DTO")
+                .andShould().haveSimpleNameNotEndingWith("Controller")
+                .andShould().haveSimpleNameNotEndingWith("Service")
+                .because("Domain model classes should represent pure domain concepts");
+
+        rule.check(classes);
+    }
+
+    @Test
+    public void applicationClassesShouldHaveAppropriateNames() {
+        ArchRule rule = classes()
+                .that().resideInAPackage("..application..")
                 .and().haveSimpleNameNotEndingWith("Test")
                 .should().haveSimpleNameEndingWith("Service")
-                .because("Service classes should end with 'Service'");
+                .orShould().haveSimpleNameEndingWith("UseCase")
+                .because("Application classes should be use cases or services");
 
         rule.check(classes);
     }
 
     @Test
-    public void controllerClassesShouldHaveControllerSuffix() {
+    public void webAdapterClassesShouldFollowNamingConvention() {
         ArchRule rule = classes()
-                .that().resideInAPackage("..controller..")
+                .that().resideInAPackage("..adapter.web..")
                 .and().haveSimpleNameNotEndingWith("Test")
                 .and().haveSimpleNameNotEndingWith("IntegrationTest")
                 .should().haveSimpleNameEndingWith("Controller")
-                .because("Controller classes should end with 'Controller'");
+                .orShould().haveSimpleNameEndingWith("DTO")
+                .because("Web adapter classes should be controllers or DTOs");
 
         rule.check(classes);
     }
 
     @Test
-    public void repositoryInterfacesShouldHaveRepositorySuffix() {
+    public void persistenceAdapterClassesShouldFollowNamingConvention() {
         ArchRule rule = classes()
-                .that().resideInAPackage("..repository..")
+                .that().resideInAPackage("..adapter.persistence..")
                 .and().areInterfaces()
                 .and().haveSimpleNameNotEndingWith("Test")
                 .should().haveSimpleNameEndingWith("Repository")
-                .because("Repository interfaces should end with 'Repository'");
-
-        rule.check(classes);
-    }
-
-    @Test
-    public void domainEntitiesShouldBeInRepositoryPackage() {
-        ArchRule rule = classes()
-                .that().areNotInterfaces()
-                .and().areNotEnums()
-                .and().resideInAPackage("..repository..")
-                .and().haveSimpleNameNotEndingWith("Repository")
-                .and().haveSimpleNameNotEndingWith("Test")
-                .should().bePackagePrivate()
-                .orShould().beProtected()
-                .orShould().bePublic()
-                .because("Domain entities should be in the repository package");
-
-        rule.check(classes);
-    }
-
-    @Test
-    public void dtoClassesShouldHaveDTOSuffix() {
-        ArchRule rule = classes()
-                .that().resideInAPackage("..dto..")
-                .and().haveSimpleNameNotEndingWith("Test")
-                .should().haveSimpleNameEndingWith("DTO")
-                .because("DTO classes should end with 'DTO'");
+                .because("Persistence adapter interfaces should be repositories");
 
         rule.check(classes);
     }
