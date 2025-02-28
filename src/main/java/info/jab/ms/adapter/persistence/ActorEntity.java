@@ -1,4 +1,4 @@
-package info.jab.ms.repository;
+package info.jab.ms.adapter.persistence;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -8,15 +8,10 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * CREATE TABLE actor (
- *     actor_id integer DEFAULT nextval('actor_actor_id_seq'::regclass) NOT NULL,
- *     first_name character varying(45) NOT NULL,
- *     last_name character varying(45) NOT NULL,
- *     last_update timestamp without time zone DEFAULT now() NOT NULL
- * );
+ * JPA entity for the actor table.
  */
 @Table("actor")
-public class Actor {
+public class ActorEntity {
 
     @Id
     @Column("actor_id")
@@ -24,19 +19,21 @@ public class Actor {
 
     @Column("first_name")
     private String firstName;
+    
     @Column("last_name")
     private String lastName;
+    
     @Column("last_update")
     private LocalDateTime lastUpdate;
 
-    public Actor(Long id, String firstName, String lastName, LocalDateTime lastUpdate) {
+    public ActorEntity(Long id, String firstName, String lastName, LocalDateTime lastUpdate) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.lastUpdate = lastUpdate;
     }
 
-    public Actor() {}
+    public ActorEntity() {}
 
     public Long getId() {
         return id;
@@ -70,13 +67,15 @@ public class Actor {
         this.lastUpdate = lastUpdate;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Actor actor = (Actor) o;
-        return Objects.equals(id, actor.id) && Objects.equals(firstName, actor.firstName) && Objects.equals(lastName, actor.lastName) && Objects.equals(lastUpdate, actor.lastUpdate);
+        ActorEntity that = (ActorEntity) o;
+        return Objects.equals(id, that.id) && 
+               Objects.equals(firstName, that.firstName) && 
+               Objects.equals(lastName, that.lastName) && 
+               Objects.equals(lastUpdate, that.lastUpdate);
     }
 
     @Override
@@ -86,11 +85,11 @@ public class Actor {
 
     @Override
     public String toString() {
-        return "Actor{" +
+        return "ActorEntity{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", lastUpdate=" + lastUpdate +
                 '}';
     }
-}
+} 
