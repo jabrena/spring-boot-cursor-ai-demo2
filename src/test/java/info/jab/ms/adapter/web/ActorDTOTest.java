@@ -20,32 +20,10 @@ class ActorDTOTest {
         ActorDTO dto = new ActorDTO(id, firstName, lastName, lastUpdate);
 
         // Then
-        assertThat(dto.getId()).isEqualTo(id);
-        assertThat(dto.getFirstName()).isEqualTo(firstName);
-        assertThat(dto.getLastName()).isEqualTo(lastName);
-        assertThat(dto.getLastUpdate()).isEqualTo(lastUpdate);
-    }
-
-    @Test
-    void shouldCreateDTOWithDefaultConstructorAndSetters() {
-        // Given
-        Long id = 1L;
-        String firstName = "John";
-        String lastName = "Doe";
-        LocalDateTime lastUpdate = LocalDateTime.now();
-
-        // When
-        ActorDTO dto = new ActorDTO();
-        dto.setId(id);
-        dto.setFirstName(firstName);
-        dto.setLastName(lastName);
-        dto.setLastUpdate(lastUpdate);
-
-        // Then
-        assertThat(dto.getId()).isEqualTo(id);
-        assertThat(dto.getFirstName()).isEqualTo(firstName);
-        assertThat(dto.getLastName()).isEqualTo(lastName);
-        assertThat(dto.getLastUpdate()).isEqualTo(lastUpdate);
+        assertThat(dto.id()).isEqualTo(id);
+        assertThat(dto.firstName()).isEqualTo(firstName);
+        assertThat(dto.lastName()).isEqualTo(lastName);
+        assertThat(dto.lastUpdate()).isEqualTo(lastUpdate);
     }
 
     @Test
@@ -111,19 +89,4 @@ class ActorDTOTest {
         assertThat(dto1.hashCode()).isNotEqualTo(dto3.hashCode());
     }
 
-    @Test
-    void shouldImplementToString() {
-        // Given
-        LocalDateTime now = LocalDateTime.now();
-        ActorDTO dto = new ActorDTO(1L, "John", "Doe", now);
-
-        // When
-        String result = dto.toString();
-
-        // Then
-        assertThat(result).contains("id=1");
-        assertThat(result).contains("firstName='John'");
-        assertThat(result).contains("lastName='Doe'");
-        assertThat(result).contains("lastUpdate=" + now);
-    }
 } 

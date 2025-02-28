@@ -20,4 +20,9 @@ public class ActorDomainServiceImpl implements ActorDomainService {
     public List<Actor> getActors(int limit) {
         return actorRepository.findActors(limit);
     }
+    
+    @Override
+    public Actor createActor(Actor actor) {
+        return actorRepository.save(actor);
+    }
 } 

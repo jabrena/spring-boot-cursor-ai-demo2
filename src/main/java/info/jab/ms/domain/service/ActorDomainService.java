@@ -16,4 +16,12 @@ public interface ActorDomainService {
      * @return a list of actors
      */
     List<Actor> getActors(int limit);
+    
+    /**
+     * Creates a new actor.
+     * 
+     * @param actor the actor to create
+     * @return the created actor with any generated IDs or timestamps
+     */
+    Actor createActor(Actor actor);
 } 

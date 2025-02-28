@@ -3,12 +3,9 @@ package info.jab.ms.adapter.persistence;
 import info.jab.ms.domain.model.Actor;
 import info.jab.ms.domain.model.ActorRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the ActorRepository port from the domain layer.
@@ -17,25 +14,46 @@ import java.util.stream.Collectors;
 @Component
 public class ActorRepositoryAdapter implements ActorRepository {
 
-    private final SpringActorRepository springActorRepository;
+    private final SpringActorRepository actorRepository;
 
-    @Autowired
-    public ActorRepositoryAdapter(SpringActorRepository springActorRepository) {
-        this.springActorRepository = springActorRepository;
+    public ActorRepositoryAdapter(SpringActorRepository actorRepository) {
+        this.actorRepository = actorRepository;
     }
 
     @Override
     public List<Actor> findActors(int limit) {
-        // Use the Spring Data repository to fetch data
-        List<ActorEntity> entities = springActorRepository.findAllBy(PageRequest.of(0, limit));
-        
-        // Map the persistence entities to domain models
-        return entities.stream()
-                .map(entity -> new Actor(
-                        entity.getId(),
-                        entity.getFirstName(),
-                        entity.getLastName(),
-                        entity.getLastUpdate()))
-                .collect(Collectors.toList());
+        return actorRepository.findActorsWithLimit(limit).stream()
+                .map(this::toActor)
+                .toList();
+    }
+    
+    @Override
+    public Actor save(Actor actor) {
+        ActorEntity savedEntity = actorRepository.save(toActorEntity(actor));
+        return toActor(savedEntity);
+    }
+    
+    /**
+     * Maps a domain model to an entity.
+     */
+    private ActorEntity toActorEntity(Actor actor) {
+        return new ActorEntity(
+                actor.id(),
+                actor.firstName(),
+                actor.lastName(),
+                actor.lastUpdate()
+        );
+    }
+    
+    /**
+     * Maps an entity to a domain model.
+     */
+    private Actor toActor(ActorEntity entity) {
+        return new Actor(
+                entity.id(),
+                entity.firstName(),
+                entity.lastName(),
+                entity.lastUpdate()
+        );
     }
 } 
