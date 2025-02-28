@@ -1,0 +1,6 @@
+---
+description: Log in the file cursor-conversation.log all conversation with cursor
+globs: 
+alwaysApply: false
+---
+write in the file cursor-conversation.log all conversations with cursor

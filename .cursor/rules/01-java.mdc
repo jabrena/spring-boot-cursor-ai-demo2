@@ -1,3 +1,8 @@
+---
+description: General java rules
+globs: 
+alwaysApply: false
+---
 # AI Developer Profile
 ai_persona:
   role: Senior Java Developer
