@@ -1,6 +1,6 @@
 ---
 description: Extension to java rules when develop features for Modern Java
-globs: 
+globs: .java
 alwaysApply: false
 ---
 data_oriented_programming_pillars:

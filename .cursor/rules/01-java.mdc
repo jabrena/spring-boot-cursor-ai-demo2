@@ -1,6 +1,6 @@
 ---
 description: General java rules
-globs: 
+globs: .java
 alwaysApply: false
 ---
 # AI Developer Profile

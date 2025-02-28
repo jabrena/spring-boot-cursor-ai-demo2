@@ -39,8 +39,8 @@ class ActorServiceTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getId()).isEqualTo(1L);
-        assertThat(result.get(0).getFirstName()).isEqualTo("First");
-        assertThat(result.get(0).getLastName()).isEqualTo("Last");
+        assertThat(result.get(0).id()).isEqualTo(1L);
+        assertThat(result.get(0).firstName()).isEqualTo("First");
+        assertThat(result.get(0).lastName()).isEqualTo("Last");
     }
 } 

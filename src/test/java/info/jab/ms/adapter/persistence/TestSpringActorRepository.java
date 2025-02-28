@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Spring Data repository interface for actor entities.
+ * Test repository for integration tests extending ListCrudRepository 
+ * to access save method directly.
  */
 @Repository
-public interface SpringActorRepository extends ListCrudRepository<ActorEntity, Long> {
-    
+public interface TestSpringActorRepository extends ListCrudRepository<ActorEntity, Long> {
     /**
      * Find actors with a specified limit.
      * 

@@ -20,32 +20,10 @@ class ActorEntityTest {
         ActorEntity entity = new ActorEntity(id, firstName, lastName, lastUpdate);
 
         // Then
-        assertThat(entity.getId()).isEqualTo(id);
-        assertThat(entity.getFirstName()).isEqualTo(firstName);
-        assertThat(entity.getLastName()).isEqualTo(lastName);
-        assertThat(entity.getLastUpdate()).isEqualTo(lastUpdate);
-    }
-
-    @Test
-    void shouldCreateEntityWithDefaultConstructorAndSetters() {
-        // Given
-        Long id = 1L;
-        String firstName = "John";
-        String lastName = "Doe";
-        LocalDateTime lastUpdate = LocalDateTime.now();
-
-        // When
-        ActorEntity entity = new ActorEntity();
-        entity.setId(id);
-        entity.setFirstName(firstName);
-        entity.setLastName(lastName);
-        entity.setLastUpdate(lastUpdate);
-
-        // Then
-        assertThat(entity.getId()).isEqualTo(id);
-        assertThat(entity.getFirstName()).isEqualTo(firstName);
-        assertThat(entity.getLastName()).isEqualTo(lastName);
-        assertThat(entity.getLastUpdate()).isEqualTo(lastUpdate);
+        assertThat(entity.id()).isEqualTo(id);
+        assertThat(entity.firstName()).isEqualTo(firstName);
+        assertThat(entity.lastName()).isEqualTo(lastName);
+        assertThat(entity.lastUpdate()).isEqualTo(lastUpdate);
     }
 
     @Test
@@ -122,8 +100,8 @@ class ActorEntityTest {
 
         // Then
         assertThat(result).contains("id=1");
-        assertThat(result).contains("firstName='John'");
-        assertThat(result).contains("lastName='Doe'");
+        assertThat(result).contains("firstName=John");
+        assertThat(result).contains("lastName=Doe");
         assertThat(result).contains("lastUpdate=" + now);
     }
 } 

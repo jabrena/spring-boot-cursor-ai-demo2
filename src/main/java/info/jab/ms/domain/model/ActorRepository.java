@@ -15,4 +15,12 @@ public interface ActorRepository {
      * @return a list of actors
      */
     List<Actor> findActors(int limit);
+    
+    /**
+     * Saves an actor to the repository.
+     * 
+     * @param actor the actor to save
+     * @return the saved actor with any generated IDs or timestamps
+     */
+    Actor save(Actor actor);
 } 
