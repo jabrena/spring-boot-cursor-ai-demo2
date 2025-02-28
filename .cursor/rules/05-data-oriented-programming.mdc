@@ -1,3 +1,8 @@
+---
+description: Extension to java rules when develop features for Modern Java
+globs: 
+alwaysApply: false
+---
 data_oriented_programming_pillars:
   - "Separate code from data"
   - "Represent data with generic data structures"

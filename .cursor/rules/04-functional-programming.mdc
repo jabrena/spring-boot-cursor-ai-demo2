@@ -1,3 +1,8 @@
+---
+description: Extension to java rules for Functional programming
+globs: 
+alwaysApply: false
+---
 functional_programming_guidelines:
   - "Try to use immutable objects"
   - "Try to not mutate the state of the objects"
