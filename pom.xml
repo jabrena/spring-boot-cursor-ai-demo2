@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.3</version>
+		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -15,12 +15,11 @@
 	<version>0.1.0</version>
 
 	<properties>
-		<java.version>23</java.version>
+		<java.version>21</java.version>
 
 		<!-- Dependencies -->
-		<testcontainers.version>1.20.5</testcontainers.version>
+		<testcontainers.version>1.20.6</testcontainers.version>
 		<archunit.version>1.4.0</archunit.version>
-		<resilience4j.version>2.1.0</resilience4j.version>
 		<spring-cloud.version>2023.0.0</spring-cloud.version>
 
 		<!-- Maven plugins -->
@@ -68,14 +67,9 @@
 		
 				<!-- Resilience4j dependencies -->
 		<dependency>
-			<groupId>io.github.resilience4j</groupId>
-			<artifactId>resilience4j-spring-boot3</artifactId>
-			<version>${resilience4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.github.resilience4j</groupId>
-			<artifactId>resilience4j-circuitbreaker</artifactId>
-			<version>${resilience4j.version}</version>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+			<version>3.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -206,13 +200,10 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<argLine>
-						--add-opens java.base/java.lang=ALL-UNNAMED
-						--add-opens java.base/java.util=ALL-UNNAMED
-						--add-opens java.base/java.lang.reflect=ALL-UNNAMED
-						--add-opens java.base/java.text=ALL-UNNAMED
-						--add-opens java.desktop/java.awt.font=ALL-UNNAMED
 						${surefireArgLine}
 					</argLine>
+					<!-- Fail fast configuration -->
+					<skipAfterFailureCount>1</skipAfterFailureCount>
 					<!-- Suppress JaCoCo output during test execution -->
 					<systemPropertyVariables>
 						<jacoco-agent.output>file</jacoco-agent.output>

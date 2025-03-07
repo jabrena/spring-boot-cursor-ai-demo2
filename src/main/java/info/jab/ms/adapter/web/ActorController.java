@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +31,11 @@ public class ActorController {
     private static final String ACTOR_SERVICE = "actorService";
 
     private final ActorService actorService;
+    private final CircuitBreakerFactory circuitBreakerFactory;
 
-    public ActorController(ActorService actorService) {
+    public ActorController(ActorService actorService, CircuitBreakerFactory circuitBreakerFactory) {
         this.actorService = actorService;
+        this.circuitBreakerFactory = circuitBreakerFactory;
     }
 
     /**
@@ -41,13 +44,18 @@ public class ActorController {
      * @return list of actor DTOs
      */
     @GetMapping("/actors")
-    @CircuitBreaker(name = ACTOR_SERVICE, fallbackMethod = "getFirstTenActorsFallback")
     public List<ActorDTO> getFirstTenActors() {
-        // Get domain objects from the application service
-        List<Actor> actors = actorService.getFirstTenActors();
-        
-        // Map domain objects to DTOs for the API response
-        return mapToActorDTOList(actors);
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create(ACTOR_SERVICE);
+        return circuitBreaker.run(
+            () -> {
+                // Get domain objects from the application service
+                List<Actor> actors = actorService.getFirstTenActors();
+                
+                // Map domain objects to DTOs for the API response
+                return mapToActorDTOList(actors);
+            },
+            throwable -> getFirstTenActorsFallback(throwable)
+        );
     }
     
     /**
@@ -56,7 +64,7 @@ public class ActorController {
      * @param e the exception that triggered the fallback
      * @return empty list with appropriate log message
      */
-    public List<ActorDTO> getFirstTenActorsFallback(Exception e) {
+    public List<ActorDTO> getFirstTenActorsFallback(Throwable e) {
         log.error("Circuit breaker triggered for getFirstTenActors: {}", e.getMessage());
         return Collections.emptyList();
     }
@@ -68,15 +76,20 @@ public class ActorController {
      * @return the created actor
      */
     @PostMapping("/actors")
-    @CircuitBreaker(name = ACTOR_SERVICE, fallbackMethod = "createActorFallback")
     public ResponseEntity<ActorDTO> createActor(@Valid @RequestBody CreateActorDTO request) {
-        // Delegate to the application service
-        Actor createdActor = actorService.createActor(request.firstName(), request.lastName());
-        
-        // Map to DTO and return with 201 Created status
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(mapToActorDTO(createdActor));
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create(ACTOR_SERVICE);
+        return circuitBreaker.run(
+            () -> {
+                // Delegate to the application service
+                Actor createdActor = actorService.createActor(request.firstName(), request.lastName());
+                
+                // Map to DTO and return with 201 Created status
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(mapToActorDTO(createdActor));
+            },
+            throwable -> createActorFallback(request, throwable)
+        );
     }
     
     /**
@@ -86,7 +99,7 @@ public class ActorController {
      * @param e the exception that triggered the fallback
      * @return service unavailable response
      */
-    public ResponseEntity<ActorDTO> createActorFallback(CreateActorDTO request, Exception e) {
+    public ResponseEntity<ActorDTO> createActorFallback(CreateActorDTO request, Throwable e) {
         log.error("Circuit breaker triggered for createActor: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
     }
