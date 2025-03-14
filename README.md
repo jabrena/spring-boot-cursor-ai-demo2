@@ -75,3 +75,5 @@ jbang setup@jabrena init --cursor java
 ./mvnw versions:display-dependency-updates
 ./mvnw versions:display-plugin-updates
 ```
+
+./mvnw quarkus:dev -Dquarkus.http.port=8081

@@ -1,26 +1,24 @@
 package info.jab.ms.service;
 
+import info.jab.ms.dto.ActorDTO;
 import info.jab.ms.repository.Actor;
-import info.jab.ms.repository.ActorRepository;
+import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
-class ActorServiceTest {
+@QuarkusTest
+public class ActorServiceTest {
 
-    /**
-     * This is a simple test that verifies the ActorService class structure
-     * without using Mockito to avoid JaCoCo instrumentation issues.
-     */
+    @Inject
+    ActorService actorService;
+
     @Test
-    void testActorServiceStructure() {
-        // This test simply verifies that the ActorService class exists and can be instantiated
-        // We're not testing functionality here, just structure for coverage
-        ActorService service = new ActorService(null);
-        assertThat(service).isNotNull();
+    public void testServiceNotNull() {
+        assertNotNull(actorService);
     }
 } 

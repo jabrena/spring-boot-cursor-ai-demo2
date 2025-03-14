@@ -2,35 +2,27 @@ package info.jab.ms.service;
 
 import info.jab.ms.dto.ActorDTO;
 import info.jab.ms.repository.Actor;
-import info.jab.ms.repository.ActorRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@ApplicationScoped
 public class ActorService {
 
-    private final ActorRepository actorRepository;
-
-    @Autowired
-    public ActorService(ActorRepository actorRepository) {
-        this.actorRepository = actorRepository;
-    }
-
+    @Transactional
     public List<ActorDTO> getFirstTenActors() {
-        List<Actor> actors = actorRepository.findAllBy(PageRequest.of(0, 10));
+        List<Actor> actors = Actor.findFirstTen();
         
         // Convert entities to DTOs to maintain layer separation
         return actors.stream()
                 .map(actor -> new ActorDTO(
-                        actor.getId(),
-                        actor.getFirstName(),
-                        actor.getLastName(),
-                        actor.getLastUpdate()))
+                        actor.id,
+                        actor.firstName,
+                        actor.lastName,
+                        actor.lastUpdate))
                 .collect(Collectors.toList());
     }
 } 

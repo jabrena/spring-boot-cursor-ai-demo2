@@ -1,28 +1,34 @@
 package info.jab.ms.config;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public abstract class TestContainersConfig {
+import java.util.HashMap;
+import java.util.Map;
 
-    @Container
-    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:14-alpine")
+public class TestContainersConfig implements QuarkusTestResourceLifecycleManager {
+
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("testdb")
             .withUsername("test")
-            .withPassword("test")
-            .withInitScript("schema.sql"); // You'll need to create this script with your schema
+            .withPassword("test");
 
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        registry.add("spring.datasource.driver-class-name", postgres::getDriverClassName);
+    @Override
+    public Map<String, String> start() {
+        POSTGRES.start();
+        
+        Map<String, String> properties = new HashMap<>();
+        properties.put("quarkus.datasource.jdbc.url", POSTGRES.getJdbcUrl());
+        properties.put("quarkus.datasource.username", POSTGRES.getUsername());
+        properties.put("quarkus.datasource.password", POSTGRES.getPassword());
+        
+        return properties;
+    }
+
+    @Override
+    public void stop() {
+        if (POSTGRES != null && POSTGRES.isRunning()) {
+            POSTGRES.stop();
+        }
     }
 } 

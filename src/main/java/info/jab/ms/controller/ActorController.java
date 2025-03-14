@@ -2,25 +2,28 @@ package info.jab.ms.controller;
 
 import info.jab.ms.dto.ActorDTO;
 import info.jab.ms.service.ActorService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/v1")
+@Path("/api/v1")
 public class ActorController {
 
     private final ActorService actorService;
 
-    @Autowired
+    @Inject
     public ActorController(ActorService actorService) {
         this.actorService = actorService;
     }
 
-    @GetMapping("/actors")
+    @GET
+    @Path("/actors")
+    @Produces(MediaType.APPLICATION_JSON)
     public List<ActorDTO> getFirstTenActors() {
         return actorService.getFirstTenActors();
     }
