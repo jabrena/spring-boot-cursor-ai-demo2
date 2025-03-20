@@ -8,6 +8,7 @@ spring init -d=web,devtools --build=maven --force ./
 jbang setup@jabrena init --cursor java
 
 ./mvnw clean verify
+./mvnw clean spring-boot:run
 
 ./mvnw versions:display-dependency-updates
 ./mvnw versions:display-plugin-updates
